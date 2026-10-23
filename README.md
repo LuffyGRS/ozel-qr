@@ -15,7 +15,7 @@ Sunucusuz, kurulumsuz, tamamen tarayıcı üzerinde çalışan gizlilik odaklı 
 
 Herhangi bir Node.js veya sunucu kurulumu gerektirmez.
 
-1. **Çevrimdışı Kullanım:** Bu repository'yi ZIP olarak indirin ve içindeki `privacyqr.html` dosyasına çift tıklayarak tarayıcınızda çalıştırın.
+1. **Çevrimdışı Kullanım:** Bu repository'yi yeşil ''Code'' tuşuna tıklayıp ZIP olarak indirin ve içindeki `privacyqr.html` dosyasına çift tıklayarak tarayıcınızda çalıştırın.
 
 ---
 

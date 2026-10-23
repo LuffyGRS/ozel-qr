@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivacyQR - Anında & Yerel QR Kod Oluşturucu</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- QRCode.js (Sunucusuz, Tamamen Local QR Kütüphanesi) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Üst Bilgi / Header -->
+    <header class="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight leading-tight">PrivacyQR</h1>
+                    <p class="text-[11px] text-slate-400">Gizlilik Odaklı QR Oluşturucu</p>
+                </div>
+            </div>
+
+            <!-- Gizlilik Rozeti -->
+            <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1.5 rounded-full font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>%100 Local & Sunucusuz</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="max-w-5xl mx-auto px-4 py-10 w-full flex-1 flex flex-col justify-center">
+        
+        <!-- Başlık Bölümü -->
+        <div class="text-center max-w-xl mx-auto mb-8">
+            <h2 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent mb-2">
+                Hızlı ve Güvenli QR Kod Üretin
+            </h2>
+            <p class="text-slate-400 text-sm leading-relaxed">
+                URL veya metninizi girin, QR kodunuz anında tarayıcınızda oluşturulsun. Verileriniz asla bir sunucuya gitmez.
+            </p>
+        </div>
+
+        <!-- Kart Yapısı -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-slate-900/50 border border-slate-800 rounded-2xl p-6 lg:p-8 backdrop-blur-xl shadow-2xl">
+            
+            <!-- Sol Taraf: Girdiler & Özelleştirme -->
+            <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+                
+                <div class="space-y-4">
+                    <!-- URL Girdisi -->
+                    <div>
+                        <label for="qrText" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                            Bağlantı (URL) veya Metin
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="qrText" value="https://github.com" placeholder="https://ornek.com" 
+                                   class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Renk Seçenekleri -->
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <label for="fgColor" class="block text-xs font-medium text-slate-400 mb-1.5">
+                                QR Kodu Rengi
+                            </label>
+                            <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-lg p-1.5">
+                                <input type="color" id="fgColor" value="#0f172a" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer">
+                                <span id="fgColorHex" class="text-xs font-mono text-slate-300">#0f172a</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="bgColor" class="block text-xs font-medium text-slate-400 mb-1.5">
+                                Arka Plan Rengi
+                            </label>
+                            <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-lg p-1.5">
+                                <input type="color" id="bgColor" value="#ffffff" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer">
+                                <span id="bgColorHex" class="text-xs font-mono text-slate-300">#ffffff</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bilgi Notu -->
+                <div class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex items-start gap-2.5 text-xs text-slate-400">
+                    <svg class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Oluşturulan QR kodlar doğrudan JavaScript ile cihazınızın belleğinde çizilir. İnternet bağlantınızı kelseniz bile çalışır.</span>
+                </div>
+
+            </div>
+
+            <!-- Sağ Taraf: Canlı Önizleme & İndirme -->
+            <div class="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-slate-950/80 border border-slate-800/80 rounded-xl relative">
+                
+                <!-- QR Kod Alanı -->
+                <div class="p-4 bg-white rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center" id="qrContainer">
+                    <div id="qrcode"></div>
+                </div>
+
+                <!-- Aksiyon Butonları -->
+                <div class="w-full flex gap-3 mt-6">
+                    <button onclick="downloadQR()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>PNG İndir</span>
+                    </button>
+
+                    <button onclick="copyQR()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 active:scale-95 border border-slate-700">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        <span id="copyBtnText">Kopyala</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500">
+        <p>Açık Kaynak & Gizlilik Dostu • Sunucusuz Mimaride Üretilmiştir</p>
+    </footer>
+
+    <!-- JavaScript Mantığı -->
+    <script>
+        let qrCodeInstance = null;
+
+        const qrTextInput = document.getElementById('qrText');
+        const fgColorInput = document.getElementById('fgColor');
+        const bgColorInput = document.getElementById('bgColor');
+        const fgHex = document.getElementById('fgColorHex');
+        const bgHex = document.getElementById('bgColorHex');
+        const qrContainer = document.getElementById('qrcode');
+
+        function generateQRCode() {
+            const text = qrTextInput.value.trim() || "https://github.com";
+            const fgColor = fgColorInput.value;
+            const bgColor = bgColorInput.value;
+
+            qrContainer.innerHTML = "";
+
+            qrCodeInstance = new QRCode(qrContainer, {
+                text: text,
+                width: 180,
+                height: 180,
+                colorDark: fgColor,
+                colorLight: bgColor,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // Event Listener'lar (Anlık Güncelleme)
+        qrTextInput.addEventListener('input', generateQRCode);
+        
+        fgColorInput.addEventListener('input', (e) => {
+            fgHex.textContent = e.target.value;
+            generateQRCode();
+        });
+
+        bgColorInput.addEventListener('input', (e) => {
+            bgHex.textContent = e.target.value;
+            generateQRCode();
+        });
+
+        // PNG İndirme Fonksiyonu
+        function downloadQR() {
+            const img = qrContainer.querySelector('img') || qrContainer.querySelector('canvas');
+            if (!img) return;
+
+            let imageSrc = img.src;
+            if (img.tagName.toLowerCase() === 'canvas') {
+                imageSrc = img.toDataURL("image/png");
+            }
+
+            const link = document.createElement('a');
+            link.href = imageSrc;
+            link.download = `qrcode_${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Panoya Resim Kopyalama
+        async function copyQR() {
+            const canvas = qrContainer.querySelector('canvas');
+            const copyBtnText = document.getElementById('copyBtnText');
+
+            if (!canvas) return;
+
+            try {
+                canvas.toBlob(async (blob) => {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    copyBtnText.textContent = "Kopyalandı!";
+                    setTimeout(() => copyBtnText.textContent = "Kopyala", 2000);
+                });
+            } catch (err) {
+                alert("Resim kopyalama tarayıcınızda desteklenmiyor.");
+            }
+        }
+
+        // Sayfa Yüklendiğinde İlk QR'ı Çiz
+        window.addEventListener('DOMContentLoaded', generateQRCode);
+    </script>
+</body>
+</html>
